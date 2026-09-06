@@ -1,0 +1,17 @@
+{
+  "name": "ReflectAI Journal",
+  "description": "A private, authenticated AI journaling workspace powered by Gemini and Cloud Firestore for multi-turn reflections, insights, and session history.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"],
+  "labels": {
+    "dev-tutorial": "cloud-run-ai-challenge"
+  },
+  "cloudRun": {
+    "serviceLabels": {
+      "dev-tutorial": "cloud-run-ai-challenge"
+    },
+    "labels": {
+      "dev-tutorial": "cloud-run-ai-challenge"
+    }
+  }
+}

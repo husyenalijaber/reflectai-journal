@@ -1,0 +1,19 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: reflectai-journal
+  labels:
+    dev-tutorial: cloud-run-ai-challenge
+spec:
+  template:
+    metadata:
+      labels:
+        dev-tutorial: cloud-run-ai-challenge
+    spec:
+      containers:
+        - ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"

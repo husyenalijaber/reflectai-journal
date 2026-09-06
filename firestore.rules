@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Default Deny Catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+
+    function isValidJournalEntry(data) {
+      return data.id is string && isValidId(data.id)
+        && data.userId is string && data.userId == request.auth.uid
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 200
+        && (!('prompt' in data) || (data.prompt is string && data.prompt.size() <= 10000))
+        && (!('summary' in data) || (data.summary is string && data.summary.size() <= 10000))
+        && (!('messages' in data) || (data.messages is list && data.messages.size() <= 200))
+        && (!('tags' in data) || (data.tags is list && data.tags.size() <= 20))
+        && (!('pinned' in data) || data.pinned is bool)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    match /users/{userId}/entries/{entryId} {
+      allow get: if isSignedIn()
+        && isValidId(userId)
+        && isValidId(entryId)
+        && request.auth.uid == userId
+        && resource.data.userId == request.auth.uid;
+
+      allow list: if isSignedIn()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && resource.data.userId == request.auth.uid;
+
+      allow create: if isSignedIn()
+        && isValidId(userId)
+        && isValidId(entryId)
+        && request.auth.uid == userId
+        && incoming().userId == request.auth.uid
+        && incoming().id == entryId
+        && isValidJournalEntry(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isSignedIn()
+        && isValidId(userId)
+        && isValidId(entryId)
+        && request.auth.uid == userId
+        && existing().userId == request.auth.uid
+        && incoming().userId == existing().userId
+        && incoming().id == existing().id
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && isValidJournalEntry(incoming())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['title', 'prompt', 'summary', 'messages', 'tags', 'pinned', 'updatedAt']);
+
+      allow delete: if isSignedIn()
+        && isValidId(userId)
+        && isValidId(entryId)
+        && request.auth.uid == userId
+        && resource.data.userId == request.auth.uid;
+    }
+  }
+}

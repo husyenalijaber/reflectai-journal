@@ -1,0 +1,66 @@
+{
+  "entities": {
+    "JournalEntry": {
+      "title": "JournalEntry",
+      "description": "User private journal reflection entry containing prompt, conversation turns, AI insights/summary, and metadata.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique document identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owner",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the journal reflection",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "prompt": {
+          "type": "string",
+          "description": "Initial reflection or journal entry content",
+          "maxLength": 10000
+        },
+        "summary": {
+          "type": "string",
+          "description": "AI-generated summary and reflection analysis",
+          "maxLength": 10000
+        },
+        "messages": {
+          "type": "array",
+          "description": "Ordered conversation turns between user and Gemini"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Categorization tags for the reflection"
+        },
+        "pinned": {
+          "type": "boolean",
+          "description": "Whether the reflection is pinned to the top of the list"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp"
+        }
+      },
+      "required": ["id", "userId", "title", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/entries/{entryId}": {
+      "schema": "JournalEntry",
+      "description": "User-isolated collection of journal reflections and multi-turn conversations with Gemini"
+    }
+  }
+}

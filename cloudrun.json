@@ -1,0 +1,11 @@
+{
+  "service": "reflectai-journal",
+  "labels": {
+    "dev-tutorial": "cloud-run-ai-challenge"
+  },
+  "cloudRun": {
+    "labels": {
+      "dev-tutorial": "cloud-run-ai-challenge"
+    }
+  }
+}
